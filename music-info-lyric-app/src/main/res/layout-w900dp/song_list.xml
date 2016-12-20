@@ -27,7 +27,7 @@
                                             android:layout_marginRight="16dp"
                                             app:layoutManager="LinearLayoutManager"
                                             tools:context="biz.davidnelson.music.activities.MainActivity"
-                                            tools:listitem="@layout/song_list_item2"/>
+                                            tools:listitem="@layout/song_list_item"/>
 
     <FrameLayout
         android:id="@+id/song_detail_container"

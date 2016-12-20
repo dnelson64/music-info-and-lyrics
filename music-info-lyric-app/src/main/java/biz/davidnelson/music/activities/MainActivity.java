@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -76,6 +77,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        Toast.makeText(this, getString(R.string.startup_message), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
     public void onSearchCriteriaEntered(String searchString) {
         String searchUrl;
         try {
@@ -115,12 +122,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSongClicked(String artist, String track, String album) {
+    public void onSongClicked(String artist, String track, String album, String imageUrl) {
 
         final Bundle args = new Bundle();
         args.putString("artist", artist);
         args.putString("track", track);
         args.putString("album", album);
+        args.putString("albumImageUrl", imageUrl);
 
         if (mTwoPane) {
             final SongDetailFragment fragment = new SongDetailFragment();

@@ -9,11 +9,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.StringRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -32,14 +37,10 @@ import biz.davidnelson.music.activities.SongDetailActivity;
 public class SongDetailFragment extends Fragment {
     final static String LYRICS_URL = "http://lyrics.wikia.com/api.php?func=getSong&fmt=json&";
 
-    TextView mLyricsTextView;
-    TextView mArtistTextView;
-    TextView mAlbumTextView;
-    TextView mTrackTextView;
-
     String mArtist;
     String mTrack;
     String mAlbum;
+    String mImageUrl;
 
     public SongDetailFragment() {
     }
@@ -48,14 +49,17 @@ public class SongDetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle args = getArguments();
+        final Bundle args = getArguments();
 
         mArtist = args.getString("artist");
         mTrack = args.getString("track");
         mAlbum = args.getString("album");
+        mImageUrl = args.getString("albumImageUrl");
+
 
         final Activity activity = this.getActivity();
-        CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+        final CollapsingToolbarLayout appBarLayout =
+            (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
         if (appBarLayout != null) {
             appBarLayout.setTitle(mTrack);
         }
@@ -64,16 +68,23 @@ public class SongDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.song_detail2, container, false);
+        final ImageLoader imageLoader =
+            VolleyRequestQueue.getInstance(getActivity().getApplicationContext()).getImageLoader();
 
-        mLyricsTextView = (TextView) rootView.findViewById(R.id.tv_lyrics);
-        mAlbumTextView = (TextView) rootView.findViewById(R.id.tv_albumName);
-        mArtistTextView = (TextView) rootView.findViewById(R.id.tv_artistName);
-        mTrackTextView = (TextView) rootView.findViewById(R.id.tv_songName);
+        View rootView = inflater.inflate(R.layout.song_detail, container, false);
 
-        mArtistTextView.setText(mArtist);
-        mAlbumTextView.setText(mAlbum);
-        mTrackTextView.setText(mTrack);
+        final TextView lyricsTextView = (TextView) rootView.findViewById(R.id.tv_lyrics);
+        final TextView albumTextView = (TextView) rootView.findViewById(R.id.tv_albumName);
+        final TextView artistTextView = (TextView) rootView.findViewById(R.id.tv_artistName);
+        final TextView trackTextView = (TextView) rootView.findViewById(R.id.tv_songName);
+        final ImageView albumImageView = (ImageView) rootView.findViewById(R.id.iv_albumImage);
+
+        artistTextView.setText(mArtist);
+        albumTextView.setText(mAlbum);
+        trackTextView.setText(mTrack);
+
+        if (!TextUtils.isEmpty(mImageUrl))
+            imageLoader.get(mImageUrl, ImageLoader.getImageListener(albumImageView, 0, 0));
 
         String lyricsUrl = "";
         try {
@@ -83,17 +94,24 @@ public class SongDetailFragment extends Fragment {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-// had some problem using standard lib to parse the wikia response as json, so will just put the
-// whole response as the lyrics
-//        JsonObjectRequest request = null;
+
         StringRequest request = null;
         if (!TextUtils.isEmpty(lyricsUrl)) {
 
             request = new StringRequest(lyricsUrl, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Log.d("debug", "response is " + response);
-                    mLyricsTextView.setText(response);
+
+                    // HACK, response is not valid json, but always seems
+                    // to start with "song = " .... and then valid json
+                    final String json = response.substring(7);
+
+                    try {
+                        JSONObject jsonObject = new JSONObject(json);
+                        lyricsTextView.setText(jsonObject.getString("lyrics"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             },
                 new Response.ErrorListener() {
@@ -104,23 +122,6 @@ public class SongDetailFragment extends Fragment {
                     }
                 });
 
-//            request = new JsonObjectRequest(lyricsUrl, null,
-//                new Response.Listener<JSONObject>() {
-//                    @Override
-//                    public void onResponse(JSONObject response) {
-//
-//                        Log.d("debug", response.toString());
-//
-//                    }
-//                },
-//                new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        Log.e(SearchDialogFragment.class.getSimpleName(), "got error from JsonArray");
-//                        error.printStackTrace();
-//                    }
-//                }
-//            );
         }
 
         if (request != null)

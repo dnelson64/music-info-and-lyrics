@@ -2,4 +2,5 @@
     <string name="app_name">Music Info &amp; Lyrics</string>
     <string name="title_song_detail">Song Detail</string>
     <string name="search_dialog_title">Enter Search Critieria</string>
+    <string name="startup_message">Hit the \'Search\' floating action button to begin</string>
 </resources>

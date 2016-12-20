@@ -3,6 +3,7 @@ package biz.davidnelson.music.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongVi
     private static SongListClickListener mSongClickListener;
 
     public interface SongListClickListener {
-        void onSongClicked(String artist, String track, String album);
+        void onSongClicked(String artist, String track, String album, String albumImageUrl);
     }
 
     public SongListAdapter(@NonNull Context context, @NonNull JSONArray songs, SongListClickListener songClickListener) {
@@ -38,13 +39,14 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongVi
     @Override
     public SongViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View inflatedView = LayoutInflater.from(parent.getContext())
-            .inflate(R.layout.song_list_item2, parent, false);
+            .inflate(R.layout.song_list_item, parent, false);
         return new SongViewHolder(inflatedView);
     }
 
     @Override
     public void onBindViewHolder(SongViewHolder holder, int position) {
         final JSONObject item;
+
         try {
             item = mSongs.getJSONObject(position);
 
@@ -53,7 +55,11 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongVi
             holder.mAlbumName.setText(item.getString("collectionName"));
 
             final String imageUrl = item.getString("artworkUrl100");
-            imageLoader.get(imageUrl, ImageLoader.getImageListener(holder.mAlbumImage, 0, 0));
+
+            holder.mAlbumImageUrl = imageUrl;
+
+            if (!TextUtils.isEmpty(imageUrl))
+                imageLoader.get(imageUrl, ImageLoader.getImageListener(holder.mAlbumImage, 0, 0));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -71,6 +77,8 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongVi
         TextView mAlbumName;
         ImageView mAlbumImage;
 
+        String mAlbumImageUrl;
+
         SongViewHolder(View v) {
             super(v);
 
@@ -82,10 +90,10 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.SongVi
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mSongClickListener.onSongClicked(
-                        mArtistName.getText().toString(),
-                        mTrackName.getText().toString(),
-                        mAlbumName.getText().toString());
+                    mSongClickListener.onSongClicked(mArtistName.getText().toString(),
+                        mTrackName.getText().toString(), mAlbumName.getText().toString(),
+                        mAlbumImageUrl);
+
                 }
             });
         }
