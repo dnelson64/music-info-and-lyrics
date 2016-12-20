@@ -9,7 +9,7 @@
               android:divider="?android:attr/dividerHorizontal"
               android:orientation="horizontal"
               android:showDividers="middle"
-              tools:context="biz.davidnelson.music.SongListActivity">
+              tools:context="biz.davidnelson.music.activities.MainActivity">
 
     <!--
     This layout is a two-pane layout for the Songs
@@ -26,8 +26,8 @@
                                             android:layout_marginLeft="16dp"
                                             android:layout_marginRight="16dp"
                                             app:layoutManager="LinearLayoutManager"
-                                            tools:context="biz.davidnelson.music.SongListActivity"
-                                            tools:listitem="@layout/song_list_content"/>
+                                            tools:context="biz.davidnelson.music.activities.MainActivity"
+                                            tools:listitem="@layout/song_list_item2"/>
 
     <FrameLayout
         android:id="@+id/song_detail_container"

@@ -9,5 +9,5 @@
                                         android:layout_marginLeft="16dp"
                                         android:layout_marginRight="16dp"
                                         app:layoutManager="LinearLayoutManager"
-                                        tools:context="biz.davidnelson.music.SongListActivity"
-                                        tools:listitem="@layout/song_list_content"/>
+                                        tools:context="biz.davidnelson.music.activities.MainActivity"
+                                        tools:listitem="@layout/song_list_item2"/>

@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">music</string>
+    <string name="app_name">Music Info &amp; Lyrics</string>
     <string name="title_song_detail">Song Detail</string>
+    <string name="search_dialog_title">Enter Search Critieria</string>
 </resources>
